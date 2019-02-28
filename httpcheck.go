@@ -116,13 +116,13 @@ func (c *Checker) GetUrl() string {
 
 // headers ///////////////////////////////////////////////////////
 
-// Will put header on request
+// WithHeader Will put header on request
 func (c *Checker) WithHeader(key, value string) *Checker {
 	c.request.Header.Set(key, value)
 	return c
 }
 
-// Will put a map of headers on request
+// WithHeaders Will put a map of headers on request
 func (c *Checker) WithHeaders(headers map[string]string) *Checker {
 	for key, value := range headers {
 		c.request.Header.Set(key, value)
@@ -130,7 +130,7 @@ func (c *Checker) WithHeaders(headers map[string]string) *Checker {
 	return c
 }
 
-// Will check if response contains header on provided key with provided value
+// HasHeader Will check if response contains header on provided key with provided value
 func (c *Checker) HasHeader(key, expectedValue string) *Checker {
 	value := c.response.Header.Get(key)
 	assert.Exactly(c.t, expectedValue, value)
@@ -138,7 +138,7 @@ func (c *Checker) HasHeader(key, expectedValue string) *Checker {
 	return c
 }
 
-// Will check if response contains a provided headers map
+// HasHeaders Will check if response contains a provided headers map
 func (c *Checker) HasHeaders(headers map[string]string) *Checker {
 
 	for key, expectedValue := range headers {
@@ -151,7 +151,7 @@ func (c *Checker) HasHeaders(headers map[string]string) *Checker {
 
 // cookies ///////////////////////////////////////////////////////
 
-// Will put cookie on request
+// HasCookie Will put cookie on request
 func (c *Checker) HasCookie(key, expectedValue string) *Checker {
 	found := false
 	for _, cookie := range c.client.Jar.Cookies(c.request.URL) {
@@ -165,7 +165,7 @@ func (c *Checker) HasCookie(key, expectedValue string) *Checker {
 	return c
 }
 
-// Will ckeck if response contains cookie with provided key and value
+// WithCookie Will ckeck if response contains cookie with provided key and value
 func (c *Checker) WithCookie(key, value string) *Checker {
 	c.request.AddCookie(&http.Cookie{
 		Name:  key,
@@ -177,7 +177,7 @@ func (c *Checker) WithCookie(key, value string) *Checker {
 
 // status ////////////////////////////////////////////////////////
 
-// Will ckeck if response status is equal to provided
+// HasStatus Will ckeck if response status is equal to provided
 func (c *Checker) HasStatus(status int) *Checker {
 	assert.Exactly(c.t, status, c.response.StatusCode)
 	return c
@@ -185,14 +185,14 @@ func (c *Checker) HasStatus(status int) *Checker {
 
 // json body /////////////////////////////////////////////////////
 
-// Will add the json-encoded struct to the body
+// WithJson Will add the json-encoded struct to the body
 func (c *Checker) WithJson(value interface{}) *Checker {
 	encoded, err := json.Marshal(value)
 	assert.Nil(c.t, err)
 	return c.WithBody(encoded)
 }
 
-// Will ckeck if body contains json with provided value
+// HasJson Will ckeck if body contains json with provided value
 func (c *Checker) HasJson(value interface{}) *Checker {
 	body, err := ioutil.ReadAll(c.response.Body)
 	assert.Nil(c.t, err)
@@ -206,14 +206,14 @@ func (c *Checker) HasJson(value interface{}) *Checker {
 
 // xml //////////////////////////////////////////////////////////
 
-// Adds a XML encoded body to the request
+// WithXml adds a XML encoded body to the request
 func (c *Checker) WithXml(value interface{}) *Checker {
 	encoded, err := xml.Marshal(value)
 	assert.Nil(c.t, err)
 	return c.WithBody(encoded)
 }
 
-// Will ckeck if body contains xml with provided value
+// HasXml Will ckeck if body contains xml with provided value
 func (c *Checker) HasXml(value interface{}) *Checker {
 	body, err := ioutil.ReadAll(c.response.Body)
 	assert.Nil(c.t, err)
@@ -227,14 +227,14 @@ func (c *Checker) HasXml(value interface{}) *Checker {
 
 // body //////////////////////////////////////////////////////////
 
-// Adds the []byte data to the body
+// WithBody adds the []byte data to the body
 func (c *Checker) WithBody(body []byte) *Checker {
 	c.request.Body = newClosingBuffer(body)
 	c.request.ContentLength = int64(len(body))
 	return c
 }
 
-// Will check if body contains provided []byte data
+// HasBody Will check if body contains provided []byte data
 func (c *Checker) HasBody(body []byte) *Checker {
 	responseBody, err := ioutil.ReadAll(c.response.Body)
 
@@ -244,7 +244,7 @@ func (c *Checker) HasBody(body []byte) *Checker {
 	return c
 }
 
-// Adds the string to the body
+// WithString adds the string to the body
 func (c *Checker) WithString(body string) *Checker {
 	c.request.Body = newClosingBufferString(body)
 	c.request.ContentLength = int64(len(body))
@@ -257,7 +257,7 @@ func (c *Checker) HasString(body string) *Checker {
 	return c.HasBody([]byte(body))
 }
 
-// Will make reqeust to built request object.
+// Check Will make reqeust to built request object.
 // After request is made, it will save response object for future assertions
 // Responsibility of this method is also to start and stop HTTP server
 func (c *Checker) Check() *Checker {
@@ -291,7 +291,7 @@ func (c *Checker) Check() *Checker {
 	return c
 }
 
-// Will call provided callback function with current response
+// Cb Will call provided callback function with current response
 func (c *Checker) Cb(cb Callback) {
 	cb(c.response)
 }
